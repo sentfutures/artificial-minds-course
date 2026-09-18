@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Forecast yourself: the digital minds expert survey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F7F4; --ink:#1B2B25; --muted:#5C6B64; --line:#CBD5CE; --panel:#FFFFFF;
+    --you:#0F6E73; --you-soft:#DCEFEF; --expert:#B8791B; --expert-soft:#F6E9D2;
+    --focus:#0F6E73;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--paper);color:var(--ink);font-family:"Manrope",system-ui,sans-serif;font-size:17px;line-height:1.55}
+  a{color:var(--you)}
+  .wrap{max-width:760px;margin:0 auto;padding:40px 20px 96px}
+  header h1{font-size:2.3rem;line-height:1.1;font-weight:800;letter-spacing:-0.02em;margin:0 0 14px}
+  header p{margin:0 0 10px;max-width:62ch}
+  .rule{height:1px;background:var(--line);margin:28px 0}
+  .progress{position:sticky;top:0;background:var(--paper);padding:12px 0 10px;z-index:5;border-bottom:1px solid var(--line)}
+  .progress .bar{height:6px;background:#E5EAE6;border-radius:3px;overflow:hidden}
+  .progress .fill{height:100%;background:var(--you);width:0;transition:width .25s}
+  .progress .meta{display:flex;justify-content:space-between;font-size:.9rem;color:var(--muted);margin-top:6px}
+  .q{margin:44px 0 0}
+  .q .num{font-weight:800;color:var(--muted);font-size:.95rem}
+  .q h2{font-size:1.45rem;line-height:1.25;margin:4px 0 6px;font-weight:800;letter-spacing:-0.01em}
+  .q .assume{font-size:.92rem;color:var(--muted);margin:0 0 14px}
+  .cons{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0 18px}
+  @media (max-width:640px){.cons{grid-template-columns:1fr}}
+  .con{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .con h3{margin:0 0 8px;font-size:.95rem;font-weight:800}
+  .con.for h3{color:var(--you)} .con.against h3{color:#8A4B12}
+  .con ul{margin:0;padding-left:18px;font-size:.93rem}
+  .con li{margin:0 0 6px}
+  .con li b{font-weight:600}
+  .answer{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+  .answer label{font-weight:600;display:block;margin-bottom:6px}
+  .sl{display:flex;align-items:center;gap:14px}
+  input[type=range]{flex:1;accent-color:var(--you);height:30px}
+  .val{min-width:84px;text-align:right;font-weight:800;font-size:1.5rem;color:var(--you);font-variant-numeric:tabular-nums}
+  .val small{font-size:.85rem;font-weight:600;color:var(--muted)}
+  .row{display:grid;grid-template-columns:150px 1fr 90px;gap:12px;align-items:center;margin:8px 0}
+  @media (max-width:640px){.row{grid-template-columns:110px 1fr 70px}}
+  .row .lab{font-weight:600;font-size:.95rem}
+  .sum{font-size:.9rem;color:var(--muted);margin-top:8px}
+  .sum.bad{color:#8A4B12;font-weight:600}
+  .note{font-size:.92rem;color:var(--muted);margin-top:10px}
+  textarea{width:100%;min-height:60px;border:1px solid var(--line);border-radius:8px;padding:10px;font:inherit;font-size:.93rem;resize:vertical;background:#FBFCFB}
+  .actions{margin:44px 0 0;display:flex;gap:12px;flex-wrap:wrap}
+  button{font:inherit;font-weight:700;border-radius:999px;padding:12px 20px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer}
+  button.ghost{background:transparent;color:var(--ink)}
+  button:focus-visible,input:focus-visible,textarea:focus-visible,details summary:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+  #results{display:none;margin-top:48px}
+  #results h2{font-size:1.9rem;letter-spacing:-0.02em;margin:0 0 6px}
+  .legend{display:flex;gap:18px;font-size:.9rem;color:var(--muted);margin:8px 0 18px;flex-wrap:wrap}
+  .legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+  .legend .y::before{background:var(--you)} .legend .m::before{background:var(--expert)} .legend .mn::before{background:#fff;border:2px solid var(--expert);width:9px;height:9px}
+  .chart{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 10px;margin:14px 0 24px;overflow-x:auto}
+  svg text{font-family:"Manrope",system-ui,sans-serif}
+  .readout{font-size:.95rem}
+  .readout li{margin:0 0 8px}
+  details{margin:8px 0}
+  summary{cursor:pointer;font-weight:600}
+  .small{font-size:.88rem;color:var(--muted)}
+  @media (prefers-reduced-motion:reduce){.progress .fill{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Forecast yourself, then meet the experts</h1>
+  <p>In early 2025, Lucius Caviola and Bradford Saad asked 67 people who work on digital minds, AI, philosophy, and forecasting to put numbers on the future of computer systems that might have subjective experience. You are about to answer the same questions.</p>
+  <p>For each one, read what the experts said for and against before you commit a number. At the end you will see your forecasts next to theirs. The goal is not to match them. It is to notice where you differ and be able to say why.</p>
+  <p class="small">Definitions the survey used: a digital mind is any computer system with a capacity for subjective experience, with a welfare capacity at least roughly that of a typical human, created by our own civilization. Some questions ask you to assume the first digital mind is a machine learning system created by 2040, whether or not you find that likely. Considerations below are paraphrased from the report; they are views held by at least one participant, not consensus.</p>
+</header>
+
+<div class="progress" aria-live="polite">
+  <div class="bar"><div class="fill" id="fill"></div></div>
+  <div class="meta"><span id="progText">0 of 14 answered</span><span>Nothing is saved when you close this page. Use "Copy my answers" at the end.</span></div>
+</div>
+
+<div id="questions"></div>
+
+<div class="actions">
+  <button id="showBtn">See how I compare</button>
+  <button class="ghost" id="copyBtn">Copy my answers</button>
+</div>
+
+<section id="results" aria-live="polite">
+  <div class="rule"></div>
+  <h2>You and the 67 experts</h2>
+  <p class="small">Each line runs from your answer to the experts' median. The hollow ring is the experts' mean, which sits far from the median wherever a few participants gave extreme answers. Questions marked with an asterisk assumed the first digital mind is a machine learning system created by 2040.</p>
+  <div class="legend"><span class="y">You</span><span class="m">Expert median</span><span class="mn">Expert mean</span></div>
+  <div class="chart" id="dumbbell"></div>
+
+  <h3>When will the first digital mind be created?</h3>
+  <p class="small">Cumulative probability by year. The experts' curve rises fast to 2050 and then flattens; several said barriers that survive the next 25 years are probably hard ones.</p>
+  <div class="chart" id="timeline"></div>
+
+  <h3>Where you differ most</h3>
+  <ul class="readout" id="readout"></ul>
+
+  <h3>What to do with this</h3>
+  <p>Pick the two questions where your number is furthest from the median. For each, go back and reread the consideration on the other side. Then write one sentence: did it move you, and if not, what do you know that the experts did not weigh? That sentence is a week 1 homework artifact. Bring it to the session.</p>
+  <p class="small">Source: Caviola, L. and Saad, B. (2025). Futures with Digital Minds: Expert Forecasts in 2025. Open access at <a href="https://arxiv.org/abs/2508.00536">arxiv.org/abs/2508.00536</a> and <a href="https://digitalminds.report/forecasting-2025/">digitalminds.report</a>. The report itself cautions that its sample likely overrepresents people who think digital minds are likely or important. Keep that in mind when you compare.</p>
+</section>
+</div>
+
+<script>
+// ---------- Question bank ----------
+// Each: id, type ('pct' | 'years' | 'scale' | 'alloc'), prompt, assume, for[], against[], expert {median, mean}
+const Q = [
+ {id:'possible', type:'pct', prompt:'How likely is it that digital minds are possible in principle?',
+  for:[['Substrate independence','what seems special about the brain is how it functions, not what it is made of, and those functions could be realized artificially.'],['Gradual replacement','replace neurons one by one with functional duplicates; if experience were tied to biology it would have to fade while cognition stayed intact, which is implausible.'],['Whole brain emulation','copy the functional organization of a conscious brain closely enough and you get a conscious system.'],['No evidence for a barrier','nothing known requires biology for experience, and no obvious obstacle blocks building an experiencing system.']],
+  against:[['Functionalism may be false','the view that some computational state is necessary and sufficient for experience is probably wrong.'],['Biological substrate requirement','experience might require living tissue.'],['Unknown theories','a future theory might rule digital minds out for reasons nobody has yet imagined.'],['Narrow substrates','if experience can only be realized in a narrow class of substrates, the odds that silicon is in that class fall.']],
+  expert:{median:90, mean:86.4}},
+ {id:'created', type:'pct', prompt:'How likely is it that digital minds will ever be created?',
+  for:[['Future ability','civilization will probably last long enough to have far more knowledge and compute, and someone will build an emulation or something else that qualifies.'],['Demand','companions, uploads, digital children, curiosity, experimentation, or just to have done it.'],['Differential demand','the desire to create will be stronger than the desire not to.'],['Byproducts','digital minds may emerge as a side effect of agency, scaling, sparse-reward training, or building AGI.'],['Not that hard','building systems that satisfy the main indicators from the literature does not look especially difficult.']],
+  against:[['Difficult or off path','creating them may be hard, or simply not on the road to AGI.'],['Preemptive catastrophe','an existential or global catastrophe may come first.'],['Regulation or deliberate choice','we may decide not to, to avoid incurring obligations.'],['No incentive','a superintelligence may have no reason to create them; belief in phenomenal consciousness may be a passing phase.'],['Structural divergence','artificial systems develop capacities in a different order from biological ones and may miss structures consciousness needs.']],
+  expert:{median:73, mean:70.7}},
+ {id:'by2030', type:'pct', prompt:'Probability that digital minds are created by 2030.', group:'timing',
+  for:[['Pace of AI progress','scaling, agentic training, and rapid experimentation with architectures.'],['Boiling frog','systems we would have called conscious ten years ago, had they appeared suddenly, may already exist; we keep moving the goalposts.'],['Already here?','several participants could not rule out that digital minds already exist.']],
+  against:[['Current models are far off','most judged present systems not close to conscious.'],['Deference to lower bounds','some anchored near-term estimates on published conservative floors.'],['Catastrophic risk','a preemptive catastrophe removes probability mass from every later year.']],
+  expert:{median:20, mean:25.5}},
+ {id:'by2050', type:'pct', prompt:'Probability that digital minds are created by 2050.', group:'timing',
+  for:[['Barriers fall','many barriers will be overcome within a decade or two.'],['AGI as catalyst','AGI would make creating digital minds vastly easier.'],['Compressed progress','technological progress may be squeezed into the next ten to fifteen years.']],
+  against:[['Hard remaining barriers','if we have not built one after the easy barriers fall, what remains is probably hard.'],['Cumulative catastrophe risk','grows with every year.'],['Regulation','general or targeted, could slow or stop progress.']],
+  expert:{median:50, mean:48.8}},
+ {id:'by2100', type:'pct', prompt:'Probability that digital minds are created by 2100.', group:'timing',
+  for:[['A lot can happen in 75 years','by then we may have overcome nearly every barrier that can be overcome.'],['Uploading demand','the desire for uploading incentivizes conscious emulations.']],
+  against:[['Deliberate non-creation','a civilization that understands the stakes may choose not to.'],['Preemptive catastrophe','the most common barrier named in text responses.']],
+  expert:{median:65, mean:62.6}},
+ {id:'beforeAGI', type:'pct', prompt:'Probability that the first digital mind is created before AGI (an AI that matches or outperforms humans at almost all economically valuable tasks).',
+  for:[['Cognitive asymmetry','being a digital mind may require less cognition than being an AGI.'],['Embodiment asymmetry','AGI needs a robot body for many tasks; a digital mind probably does not.'],['Affect is central to intelligence','if general intelligence requires emotion, AGI would be a digital mind and lesser systems might be too.']],
+  against:[['Short AGI timelines, uncertain mind timelines','we understand intelligence far better than experience.'],['Experience is dispensable','economically valuable tasks do not require it, so incentives point at AGI first.'],['Decoupling evidence','if current systems are not conscious, cognition and consciousness come apart.'],['AGI enables digital minds','not the other way round.'],['Anthropomorphic illusion','LLMs make us feel closer than we are.']],
+  expert:{median:27.5, mean:null}},
+ {id:'speed1B', type:'years', prompt:'After the first digital mind, how many years until the collective welfare capacity of all digital minds matches one billion humans?', assume:true,
+  for:[['Compute overhang','when one can be built, compute exists to run many; compare how fast ChatGPT reached hundreds of millions of users.'],['Cheap replication','copying a digital mind is cheap once it exists.'],['Coordination deficit','preventing it would need strong coordination that is unlikely in time.'],['Super-beneficiaries','a single mind running fast or at scale could carry enormous welfare capacity alone.']],
+  against:[['Compute and energy limits','a billion human-scale minds needs serious compute; energy limits bite around 2030 on current trends.'],['Demand deficit','there may be little demand for minds of this kind, or only in narrow use cases.'],['Ethical and regulatory brakes','recognizing what we are doing may make us stop; governments may cap production.'],['Sci-fi penalty','a population past a billion sounds crazy, which some treated as a reason to discount it.']],
+  expert:{median:5, mean:89.2, meanNote:'mean excludes "never" answers'}},
+ {id:'mlPossible', type:'pct', prompt:'How likely is it that some machine learning systems (large language models, reinforcement learning agents) could, in principle, have subjective experiences?',
+  for:[['Universal approximation','ML systems can in principle approximate any computation, including whatever an emulation does.'],['Structural duplication','they might realize experience by duplicating the requisite structure.'],['Biology-like training','delayed, sparse rewards in complex environments resemble the pressures that shaped animal minds.']],
+  against:[['Recursion requirement','ML systems may not be able to exhibit the kind of recurrence experience needs.'],['In-practice barriers','the consciousness-relevant causal roles may never actually get realized, and self-monitoring may never be built in.'],['Similarity heuristic','when experts introspect on how they estimate this, they lean on similarity to brains, which favors emulations, not language models.']],
+  expert:{median:70, mean:64.7}},
+ {id:'brainPossible', type:'pct', prompt:'How likely is it that some brain simulations (whole brain emulations of human or animal brains) could, in principle, have subjective experiences?',
+  for:[['Fine-grained functional copy','replicating the relevant functions of a conscious brain in a computer plausibly yields experience.'],['Similarity','the closest thing to a system we already know is conscious.']],
+  against:[['More assumptions than neuromorphic','a simulation needs more to hold than hardware that replicates rather than simulates the functions.'],['Simulation is not replication','some hold that simulating a brain is like simulating a hurricane: nothing gets wet.']],
+  expert:{median:88, mean:81.3}},
+ {id:'firstType', type:'alloc', prompt:'What will the first digital mind be? Allocate 100 points.', assume:false,
+  items:[['Machine learning system',50,47.1],['A brain simulation',15,18.0],['Some other system (neuromorphic, quantum)',10,12.2],['No digital mind is ever created',20,24.5]],
+  for:[['Investment swamps plausibility','near-term investment in ML dwarfs everything else, and architecture path dependence keeps it that way.'],['Training trajectory','we are making ML systems more capable and agentic in complex environments, which correlates with experience.'],['Byproduct route','ML minds could arrive by accident while advancing capabilities.']],
+  against:[['Emulations are more likely conscious but later','past brain-simulation projects failed to deliver; if emulations arrive, it is in the distant future or after AGI.'],['Neuromorphic knowledge is thin','we barely know how to build large ones.'],['Balance investment against plausibility','low probability times high investment can equal high probability times low investment, so ML and "other" may be roughly tied.'],['Hybrids','if categories can combine, hybrids are the most promising candidates.']],
+  expert:null},
+ {id:'social', type:'pct', prompt:'Ten years after the first digital mind, what proportion of digital minds will have a social function, meaning they are designed to interact with humans in a conversational, human-like way?', assume:true,
+  for:[['Intentional design','companions, human-like agents, emulations, and post-human successors are all social by design.'],['Economic value','minds tailored to individual users may be the most valuable kind.'],['Explainability demand','humans prefer systems that can explain their actions and inner states.'],['Experience enhances engagement','people may prefer to be served by something that experiences.']],
+  against:[['More valuable elsewhere','cognitive labor and specialized tasks need no social interaction.'],['One per person ceiling','demand for social minds may cap near one per consumer.'],['Non-social suffices','most minds can do their job without talking to us.'],['Disinterest in humans','minds with very different perspectives may not find us worth engaging.'],['Experience not needed for social roles','so there is no incentive to make social systems conscious.']],
+  expert:{median:10, mean:30.9, note:'bimodal: most said a small minority, about a third said the majority'}},
+ {id:'producers', type:'alloc', prompt:'Ten years after the first digital mind, what proportion of digital minds will be primarily produced by each kind of actor? Allocate 100 points.', assume:true,
+  items:[['Companies',65,59.1],['Governments',15,20.9],['Universities',5,8.5],['Open-source developers',5,6.0],['Others (nonprofits, individuals, religious groups)',3,9.9]],
+  for:[['Early movers stay ahead','companies in the leading country have driven AI progress and will drive this.'],['Government-to-corporate handoff','early minds might be public, but financial incentives shift production to firms.'],['Military origins','militaries could be first in autonomous or security contexts.']],
+  against:[['Digital minds producing digital minds','once capable, they may become the main producers, even under indirect oversight.'],['Copying dominates','mass replication by users, firms, or the minds themselves may swamp original production.'],['Post-human creators','enhanced humans merged with AI may become the primary creators.'],['Unclear attribution','in public-private chains it may be unclear who the primary producer is.']],
+  expert:null},
+ {id:'deliberate', type:'pct', prompt:'Ten years after the first digital mind, what proportion of digital minds will have been created intentionally by humans, meaning by people who meant to create a digital mind?', assume:true,
+  for:[['Understanding yields control','once the mechanisms are understood, most creation is deliberate.'],['Demand for conscious systems','companionship, emotional intelligence, or ethical experimentation may create demand for experience specifically.']],
+  against:[['Natural byproduct','minds emerge as a side effect of systems optimized for other goals.'],['Social functions might cause it','systems built to interact may become minds without anyone intending it.'],['False foresight','we think we would notice the transition and may not.'],['No point if indistinguishable','if conscious and non-conscious systems behave identically, there is little reason to aim for consciousness.'],['Disbelief and discomfort','skepticism or unease may steer developers away from intending it.']],
+  expert:{median:37, mean:43.6, note:'tri-modal: one large group near 0, one near 100, a smaller group near 50'}},
+ {id:'netWelfare', type:'scale', prompt:'Ten years after the first digital mind, what will the net welfare of all digital minds be? 1 is strongly negative, 4 is roughly neutral, 7 is strongly positive.', assume:true,
+  for:[['Intentional welfare design','minds may be engineered to be happy and avoid suffering.'],['Goals linked to experiences','reward functions could tie doing the task well to feeling good.'],['Economic incentives','happier minds may be more productive, stable, and marketable.'],['Self-modification','unlike us, they may be able to adjust their own states or request adjustments.']],
+  against:[['Exploitation and mistreatment','minds treated as tools or entertainment, abused by users who do not recognize them.'],['No protections','legal, ethical, and institutional safeguards may not exist.'],['Welfare neglected in design','optimized for usefulness and obedience, not flourishing.'],['Suffering during training','reward and punishment dynamics could make training a concentrated source of pain.'],['Constrained agency and dull tasks','lives of limited autonomy doing monotonous work.']],
+  expert:{median:5.0, mean:4.4, note:'20% expected net negative'}},
+ {id:'predeploy', type:'pct', prompt:'Ten years after the first digital mind, what proportion of all digital mind welfare will occur before deployment, during training and safety testing?', assume:true,
+  for:[['Intense training','sharp reward and punishment signals, rapid adaptation, high cognitive demand; brief but intense.'],['Painful training','the reliance on strong reinforcement signals could make training the concentrated site of suffering.'],['Flat deployment','after training, minds may run in predictable, emotionally neutral environments.']],
+  against:[['Scale of deployment','deployed copies vastly outnumber training runs.'],['Inference dominates compute','over time, running models uses more compute than training them.'],['Minds absent from early training','a system becomes a mind partway through training; earlier stages do not count.'],['Blurring phases','continuous learning may erase the training-deployment line.']],
+  expert:{median:10, mean:23.1}},
+];
+
+// ---------- Render ----------
+const state = {};
+const container = document.getElementById('questions');
+let n = 0;
+Q.forEach((q) => {
+  n += 1;
+  const el = document.createElement('section');
+  el.className = 'q'; el.id = 'q-'+q.id;
+  const assume = q.assume ? '<p class="assume">Assume the first digital mind is a machine learning system created by 2040.</p>' : '';
+  const cons = `
+    <div class="cons">
+      <div class="con for"><h3>What pushed experts up</h3><ul>${q.for.map(c=>`<li><b>${c[0]}:</b> ${c[1]}</li>`).join('')}</ul></div>
+      <div class="con against"><h3>What pushed experts down</h3><ul>${q.against.map(c=>`<li><b>${c[0]}:</b> ${c[1]}</li>`).join('')}</ul></div>
+    </div>`;
+  let answer = '';
+  if (q.type==='pct') {
+    state[q.id] = null;
+    answer = `<div class="answer"><label for="in-${q.id}">Your probability</label>
+      <div class="sl"><input type="range" id="in-${q.id}" min="0" max="100" step="0.5" value="50" data-q="${q.id}" aria-label="${q.prompt}"><div class="val" id="v-${q.id}">…</div></div>
+      <p class="note">Move the slider to commit a number. Nothing counts until you move it.</p></div>`;
+  } else if (q.type==='years') {
+    state[q.id] = null;
+    answer = `<div class="answer"><label for="in-${q.id}">Your estimate, in years (log scale; drag to the far right for "never")</label>
+      <div class="sl"><input type="range" id="in-${q.id}" min="0" max="100" step="1" value="50" data-q="${q.id}" aria-label="${q.prompt}"><div class="val" id="v-${q.id}">…</div></div>
+      <p class="note">Left end is under a year; right end is never.</p></div>`;
+  } else if (q.type==='scale') {
+    state[q.id] = null;
+    answer = `<div class="answer"><label for="in-${q.id}">Your rating, 1 to 7</label>
+      <div class="sl"><input type="range" id="in-${q.id}" min="1" max="7" step="0.5" value="4" data-q="${q.id}" aria-label="${q.prompt}"><div class="val" id="v-${q.id}">…</div></div></div>`;
+  } else if (q.type==='alloc') {
+    state[q.id] = q.items.map(()=>null);
+    answer = `<div class="answer"><label>Your allocation (should total 100)</label>` +
+      q.items.map((it,i)=>`<div class="row"><span class="lab">${it[0]}</span><input type="range" min="0" max="100" step="1" value="0" data-q="${q.id}" data-i="${i}" aria-label="${it[0]}"><span class="val" id="v-${q.id}-${i}" style="font-size:1.15rem">0</span></div>`).join('') +
+      `<div class="sum" id="sum-${q.id}">Total: 0</div></div>`;
+  }
+  el.innerHTML = `<div class="num">${n} of ${Q.length}</div><h2>${q.prompt}</h2>${assume}${cons}${answer}
+    <details><summary>Why I differ (optional)</summary><textarea id="why-${q.id}" placeholder="One sentence. What do you weigh that the considerations do not?"></textarea></details>`;
+  container.appendChild(el);
+});
+
+function yearsFromSlider(v){ // 0..100 -> years, log scale 0.5..10000, 100 => never
+  if (v>=100) return Infinity;
+  const min=Math.log10(0.5), max=Math.log10(10000);
+  return Math.pow(10, min + (max-min)*v/99);
+}
+function fmtYears(y){ if(!isFinite(y)) return 'never'; if(y<1) return '<1 yr'; if(y<10) return y.toFixed(1)+' yrs'; return Math.round(y)+' yrs'; }
+
+container.addEventListener('input', (e)=>{
+  const inp = e.target; if (inp.tagName!=='INPUT') return;
+  const q = Q.find(x=>x.id===inp.dataset.q);
+  if (q.type==='pct'){ state[q.id]=+inp.value; document.getElementById('v-'+q.id).innerHTML=(+inp.value)+'<small>%</small>'; }
+  else if (q.type==='years'){ state[q.id]=yearsFromSlider(+inp.value); document.getElementById('v-'+q.id).textContent=fmtYears(state[q.id]); }
+  else if (q.type==='scale'){ state[q.id]=+inp.value; document.getElementById('v-'+q.id).textContent=(+inp.value).toFixed(1); }
+  else if (q.type==='alloc'){
+    const i=+inp.dataset.i; state[q.id][i]=+inp.value; document.getElementById(`v-${q.id}-${i}`).textContent=inp.value;
+    const total = state[q.id].reduce((a,b)=>a+(b||0),0);
+    const s=document.getElementById('sum-'+q.id); s.textContent='Total: '+total+(total===100?'':' (aim for 100)'); s.className='sum'+(total===100?'':' bad');
+  }
+  updateProgress();
+});
+
+function answered(q){ const v=state[q.id]; if(q.type==='alloc') return v.some(x=>x!==null&&x>0); return v!==null; }
+function updateProgress(){
+  const c = Q.filter(answered).length;
+  document.getElementById('fill').style.width=(100*c/Q.length)+'%';
+  document.getElementById('progText').textContent=`${c} of ${Q.length} answered`;
+}
+
+// ---------- Results ----------
+document.getElementById('showBtn').addEventListener('click', ()=>{
+  const res=document.getElementById('results'); res.style.display='block';
+  drawDumbbell(); drawTimeline(); drawReadout();
+  res.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+});
+
+function drawDumbbell(){
+  // Build rows: pct/scale/years normalized to 0..100 display, alloc expanded
+  const rows=[];
+  Q.forEach(q=>{
+    const star = q.assume?'*':'';
+    if(q.type==='pct'){ rows.push({label:shortLabel(q)+star, you:state[q.id], med:q.expert.median, mean:q.expert.mean, unit:'%', max:100}); }
+    else if(q.type==='scale'){ rows.push({label:shortLabel(q)+star, you:state[q.id], med:q.expert.median, mean:q.expert.mean, unit:'', max:7, min:1}); }
+    else if(q.type==='years'){ const y=state[q.id]; rows.push({label:shortLabel(q)+star, you: y===null?null:toLog(y), med:toLog(5), mean:toLog(89.2), unit:'yrs', max:100, rawYou:y, rawMed:5, rawMean:89.2, log:true}); }
+    else if(q.type==='alloc'){ q.items.forEach((it,i)=>rows.push({label:(q.id==='firstType'?'First: ':'Made by: ')+it[0].replace(' (neuromorphic, quantum)','').replace(' (nonprofits, individuals, religious groups)',''), you:state[q.id][i], med:it[1], mean:it[2], unit:'%', max:100})); }
+  });
+  const W=720, left=250, right=40, rowH=30, top=26; const H=top+rows.length*rowH+30;
+  const x=(v,r)=>{ const min=r.min||0; return left+((v-min)/((r.max)-min))*(W-left-right); };
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Your forecasts compared with expert medians">`;
+  // axis
+  [0,25,50,75,100].forEach(t=>{ const xx=left+t/100*(W-left-right); s+=`<line x1="${xx}" y1="${top-8}" x2="${xx}" y2="${H-24}" stroke="#E5EAE6"/><text x="${xx}" y="${H-8}" font-size="11" fill="#5C6B64" text-anchor="middle">${t}</text>`; });
+  rows.forEach((r,i)=>{
+    const y=top+i*rowH+rowH/2;
+    s+=`<text x="${left-10}" y="${y+4}" font-size="12.5" fill="#1B2B25" text-anchor="end">${esc(r.label)}</text>`;
+    const xm=x(r.med,r);
+    if(r.mean!=null){ const xn=x(r.mean,r); s+=`<circle cx="${xn}" cy="${y}" r="5" fill="#fff" stroke="#B8791B" stroke-width="2"/>`; }
+    if(r.you!=null){ const xy=x(r.you,r); s+=`<line x1="${xy}" y1="${y}" x2="${xm}" y2="${y}" stroke="#9AA9A2" stroke-width="2"/><circle cx="${xy}" cy="${y}" r="6.5" fill="#0F6E73"/>`; }
+    s+=`<circle cx="${xm}" cy="${y}" r="6.5" fill="#B8791B"/>`;
+    if(r.you==null){ s+=`<text x="${W-right+4}" y="${y+4}" font-size="11" fill="#5C6B64">not answered</text>`; }
+  });
+  s+=`<text x="${left}" y="${top-14}" font-size="11" fill="#5C6B64">0 to 100 for probabilities and shares; 1 to 7 for net welfare; log scale for years (0.5 to never)</text></svg>`;
+  document.getElementById('dumbbell').innerHTML=s;
+}
+function toLog(y){ if(!isFinite(y)) return 100; const min=Math.log10(0.5), max=Math.log10(10000); return Math.max(0,Math.min(100,(Math.log10(Math.max(y,0.5))-min)/(max-min)*100)); }
+function shortLabel(q){
+  return ({possible:'Possible in principle',created:'Ever created',by2030:'Created by 2030',by2050:'Created by 2050',by2100:'Created by 2100',beforeAGI:'First mind before AGI',speed1B:'Years to 1B-human welfare',mlPossible:'ML systems could experience',brainPossible:'Brain sims could experience',social:'Share with social function',deliberate:'Share created deliberately',netWelfare:'Net welfare (1 to 7)',predeploy:'Share of welfare pre-deployment'})[q.id]||q.id;
+}
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+
+function drawTimeline(){
+  const years=[2025,2030,2040,2050,2100], exp=[4.5,20,40,50,65];
+  const you=[null,state.by2030,null,state.by2050,state.by2100];
+  const W=720,H=260,l=50,r=20,t=20,b=40;
+  const xs=y=>l+((y-2020)/(2100-2020))*(W-l-r), ys=p=>t+(1-p/100)*(H-t-b);
+  let s=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Cumulative probability of creation by year, you versus experts">`;
+  [0,25,50,75,100].forEach(p=>{s+=`<line x1="${l}" y1="${ys(p)}" x2="${W-r}" y2="${ys(p)}" stroke="#E5EAE6"/><text x="${l-8}" y="${ys(p)+4}" font-size="11" fill="#5C6B64" text-anchor="end">${p}%</text>`;});
+  years.forEach(y=>{s+=`<text x="${xs(y)}" y="${H-14}" font-size="11" fill="#5C6B64" text-anchor="middle">${y}</text>`;});
+  s+=`<polyline fill="none" stroke="#B8791B" stroke-width="2.5" points="${years.map((y,i)=>xs(y)+','+ys(exp[i])).join(' ')}"/>`;
+  years.forEach((y,i)=>{s+=`<circle cx="${xs(y)}" cy="${ys(exp[i])}" r="5" fill="#B8791B"/>`;});
+  const pts=years.map((y,i)=>you[i]!=null?[xs(y),ys(you[i])]:null).filter(Boolean);
+  if(pts.length>1) s+=`<polyline fill="none" stroke="#0F6E73" stroke-width="2.5" stroke-dasharray="6 5" points="${pts.map(p=>p.join(',')).join(' ')}"/>`;
+  pts.forEach(p=>{s+=`<circle cx="${p[0]}" cy="${p[1]}" r="5.5" fill="#0F6E73"/>`;});
+  s+=`<text x="${W-r}" y="${t+2}" font-size="11" fill="#B8791B" text-anchor="end">experts, median</text>`;
+  if(pts.length) s+=`<text x="${W-r}" y="${t+16}" font-size="11" fill="#0F6E73" text-anchor="end">you</text>`;
+  s+='</svg>';
+  document.getElementById('timeline').innerHTML=s;
+}
+
+function drawReadout(){
+  const diffs=[];
+  Q.forEach(q=>{
+    if(q.type==='pct'&&state[q.id]!=null) diffs.push({q, d:state[q.id]-q.expert.median, txt:`${shortLabel(q)}: you ${state[q.id]}%, experts ${q.expert.median}%`});
+    if(q.type==='scale'&&state[q.id]!=null) diffs.push({q, d:(state[q.id]-q.expert.median)*100/6, txt:`${shortLabel(q)}: you ${state[q.id].toFixed(1)}, experts ${q.expert.median.toFixed(1)}`});
+    if(q.type==='years'&&state[q.id]!=null) diffs.push({q, d:toLog(state[q.id])-toLog(5), txt:`${shortLabel(q)}: you ${fmtYears(state[q.id])}, experts 5 years (median)`});
+    if(q.type==='alloc') q.items.forEach((it,i)=>{ if(state[q.id][i]!=null) diffs.push({q, d:state[q.id][i]-it[1], txt:`${it[0]}: you ${state[q.id][i]}, experts ${it[1]}`}); });
+  });
+  diffs.sort((a,b)=>Math.abs(b.d)-Math.abs(a.d));
+  const ul=document.getElementById('readout'); ul.innerHTML='';
+  if(!diffs.length){ ul.innerHTML='<li>Answer some questions above and the comparison will appear here.</li>'; return; }
+  diffs.slice(0,4).forEach(x=>{
+    const dir = x.d>0?'above':'below';
+    const why = (document.getElementById('why-'+x.q.id)||{}).value||'';
+    const li=document.createElement('li');
+    li.innerHTML=`${esc(x.txt)}. You are ${dir} the median${x.q.expert&&x.q.expert.note?' ('+esc(x.q.expert.note)+')':''}.${why?' Your note: <i>'+esc(why)+'</i>':' Reread the '+(x.d>0?'"pushed down"':'"pushed up"')+' column for this question.'}`;
+    ul.appendChild(li);
+  });
+}
+
+document.getElementById('copyBtn').addEventListener('click', async ()=>{
+  const out={source:'Caviola & Saad 2025 expert survey, course companion', date:new Date().toISOString(), answers:{}, notes:{}};
+  Q.forEach(q=>{ out.answers[q.id]= q.type==='years'? (isFinite(state[q.id])?state[q.id]:(state[q.id]===null?null:'never')) : state[q.id]; const w=document.getElementById('why-'+q.id); if(w&&w.value) out.notes[q.id]=w.value; });
+  const text=JSON.stringify(out,null,2);
+  try{ await navigator.clipboard.writeText(text); document.getElementById('copyBtn').textContent='Copied'; setTimeout(()=>document.getElementById('copyBtn').textContent='Copy my answers',1500); }
+  catch(e){ prompt('Copy your answers:', text); }
+});
+</script>
+</body>
+</html>

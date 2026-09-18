@@ -1,0 +1,426 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Artificial Minds Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Spectral:wght@600&display=swap">
+<style>
+:root{
+  --ground:#F3F5F8; --surface:#FFFFFF; --surface-2:#EAEEF3; --panel:#FFFFFF;
+  --ink:#151D28; --ink-2:#4E5B6B; --ink-3:#7B8896;
+  --rule:#DCE2EA; --rule-2:#C6CFDA;
+  --accent:#3B56A6; --accent-soft:#E5E9F6;
+  --graded:#136A5C; --flag:#9C5A16; --flag-soft:#F7EBDC;
+  --b1:#1B5A99; --b2:#4A48A6; --b3:#8A3390; --b4:#9C3556;
+  --b5:#8C520F; --b6:#5E5C10; --b7:#236A3B; --b8:#0E5F6C;
+  --nodefill:#FFFFFF; --dim:.22;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#0E131A; --surface:#161E28; --surface-2:#1C2531; --panel:#141C25;
+  --ink:#E6EBF1; --ink-2:#9DA9B8; --ink-3:#77838f;
+  --rule:#26313F; --rule-2:#36434f;
+  --accent:#93AAEC; --accent-soft:#1E2740;
+  --graded:#54BCA6; --flag:#DE9C51; --flag-soft:#322414;
+  --b1:#6FA9E8; --b2:#9A9BEA; --b3:#D68CD8; --b4:#E88BA4;
+  --b5:#DFA55E; --b6:#C2C05F; --b7:#6FC98A; --b8:#59BCCB;
+  --nodefill:#1A2430; --dim:.16;
+}}
+:root[data-theme="dark"]{
+  --ground:#0E131A; --surface:#161E28; --surface-2:#1C2531; --panel:#141C25;
+  --ink:#E6EBF1; --ink-2:#9DA9B8; --ink-3:#77838f;
+  --rule:#26313F; --rule-2:#36434f;
+  --accent:#93AAEC; --accent-soft:#1E2740;
+  --graded:#54BCA6; --flag:#DE9C51; --flag-soft:#322414;
+  --b1:#6FA9E8; --b2:#9A9BEA; --b3:#D68CD8; --b4:#E88BA4;
+  --b5:#DFA55E; --b6:#C2C05F; --b7:#6FC98A; --b8:#59BCCB;
+  --nodefill:#1A2430; --dim:.16;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.5}
+.shell{max-width:1400px;margin:0 auto;padding-inline:16px;padding-block:0 40px}
+
+header.mast{padding-block:26px 14px;display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-end;justify-content:space-between}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);margin:0 0 8px}
+h1{font-family:Spectral,Georgia,serif;font-weight:600;font-size:clamp(26px,4vw,36px);line-height:1.1;letter-spacing:-.015em;margin:0}
+.sub{color:var(--ink-2);font-size:14px;margin:8px 0 0;max-width:60ch}
+.counts{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-3);display:flex;gap:16px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-block:12px;border-block:1px solid var(--rule)}
+.search{flex:1 1 200px;min-width:0;position:relative;display:flex;align-items:center}
+.search input{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--surface);border:1px solid var(--rule-2);border-radius:7px;padding:8px 12px}
+.search input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent}
+button.ctl{font:inherit;font-size:13px;color:var(--ink-2);background:var(--surface);border:1px solid var(--rule-2);border-radius:7px;padding:7px 11px;cursor:pointer;white-space:nowrap}
+button.ctl:hover{border-color:var(--accent);color:var(--ink)}
+button.ctl[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+button.ctl:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.sep{width:1px;height:24px;background:var(--rule);margin-inline:2px}
+.hits{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--ink-3);min-width:64px}
+
+.stage{display:grid;grid-template-columns:1fr 312px;gap:14px;margin-top:14px;align-items:start}
+@media (max-width:900px){.stage{grid-template-columns:1fr}}
+.canvaswrap{position:relative;background:var(--surface);border:1px solid var(--rule);border-radius:10px;overflow:hidden;height:clamp(520px,74vh,880px)}
+svg#map{width:100%;height:100%;display:block;cursor:grab;touch-action:none}
+svg#map.drag{cursor:grabbing}
+.zoombox{position:absolute;right:10px;bottom:10px;display:flex;gap:5px}
+.zoombox button{width:32px;height:32px;padding:0;font-size:15px;line-height:1;display:grid;place-items:center}
+.hint{position:absolute;left:12px;bottom:12px;font-size:11.5px;color:var(--ink-3);background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:4px 8px;pointer-events:none}
+
+aside.panel{background:var(--panel);border:1px solid var(--rule);border-radius:10px;padding:16px;position:sticky;top:14px;max-height:clamp(520px,74vh,880px);overflow:auto}
+.pcrumb{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.03em;color:var(--ink-3);margin:0 0 8px;line-height:1.5}
+.pterm{font-family:Spectral,Georgia,serif;font-size:19px;font-weight:600;margin:0 0 8px;line-height:1.22}
+.pmeta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tag{font-family:"IBM Plex Mono",monospace;font-size:10px;border:1px solid var(--rule-2);color:var(--ink-3);border-radius:4px;padding:2px 5px}
+.tag.g{color:var(--graded);border-color:var(--graded)}
+.pdef{font-size:13.5px;color:var(--ink-2);margin:0 0 12px}
+.pdef em{font-style:normal;color:var(--ink);font-weight:500}
+.tag.n{color:var(--accent);border-color:var(--accent)}
+.pmetaline{font-size:12.5px;color:var(--ink-3);margin:0 0 7px}
+.pmetaline b{color:var(--ink-2);font-weight:600}
+.pfix{font-size:12.5px;color:var(--flag);background:var(--flag-soft);border-left:2px solid var(--flag);padding:8px 10px;border-radius:0 6px 6px 0;margin-bottom:12px}
+.pkids{border-top:1px solid var(--rule);padding-top:11px;margin-top:4px}
+.pkids h4{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin:0 0 7px;font-weight:500}
+.pkids button{display:block;width:100%;text-align:left;font:inherit;font-size:13px;color:var(--ink-2);background:none;border:0;border-radius:5px;padding:4px 6px;cursor:pointer}
+.pkids button:hover{background:var(--surface-2);color:var(--ink)}
+.pempty{color:var(--ink-3);font-size:13px}
+.legend{margin-top:12px;border-top:1px solid var(--rule);padding-top:11px;display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--ink-2)}
+.legend div{display:flex;gap:8px;align-items:center}
+.sw{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+footer{margin-top:20px;font-size:12.5px;color:var(--ink-3);max-width:78ch}
+footer b{color:var(--ink-2);font-weight:500}
+.node{cursor:pointer}
+.node:focus-visible{outline:none}
+.node:focus-visible .box{stroke:var(--accent);stroke-width:2.5}
+.faded{opacity:var(--dim)}
+@media (prefers-reduced-motion:no-preference){#viewport{transition:transform .28s cubic-bezier(.4,0,.2,1)}#viewport.nt{transition:none}}
+</style>
+
+<div class="shell">
+<header class="mast">
+  <div>
+    <p class="eyebrow">Sentient Futures &middot; Artificial Minds Research</p>
+    <h1>Artificial Minds Map</h1>
+    <p class="sub">The same atlas, drawn. Click a node to open it, click again to close it. Definitions sit in the panel, or turn them on inside the leaves.</p>
+  </div>
+  <div class="counts" id="counts"></div>
+</header>
+
+<div class="bar">
+  <div class="search"><input id="q" type="search" placeholder="Search terms and definitions" autocomplete="off" aria-label="Search"></div>
+  <span class="hits" id="hits"></span>
+  <div class="sep"></div>
+  <button class="ctl" id="b-defs" type="button" aria-pressed="false">Definitions in leaves</button>
+  <button class="ctl" id="b-graded" type="button" aria-pressed="false">&#9733; Graded only</button>
+  <div class="sep"></div>
+  <button class="ctl" id="b-groups" type="button">Groups</button>
+  <button class="ctl" id="b-all" type="button">Everything</button>
+  <button class="ctl" id="b-branches" type="button">Branches only</button>
+</div>
+
+<div class="stage">
+  <div class="canvaswrap">
+    <svg id="map" role="group" aria-label="Node and link map of the Artificial Minds Atlas: eight branches of the digital minds research taxonomy, expanding to groups and individual concepts."><g id="viewport"><g id="edges"></g><g id="nodes"></g></g></svg>
+    <div class="hint">Click a branch to open it. Drag to pan, scroll to zoom.</div>
+    <div class="zoombox">
+      <button class="ctl" id="z-out" type="button" aria-label="Zoom out">&minus;</button>
+      <button class="ctl" id="z-in" type="button" aria-label="Zoom in">+</button>
+      <button class="ctl" id="z-fit" type="button">Fit</button>
+    </div>
+  </div>
+  <aside class="panel" id="panel" aria-live="polite"></aside>
+</div>
+
+<footer id="foot"></footer>
+</div>
+
+<script src="atlas.data.js"></script>
+<script>
+const A=window.ATLAS;
+const $=s=>document.querySelector(s);
+if(!A){$("#panel").innerHTML='<p class="pempty">atlas.data.js did not load, so there is nothing to draw.</p>';}
+
+/* ---------- model ---------- */
+const HUE=["b1","b2","b3","b4","b5","b6","b7","b8"];
+let ID=0;
+function build(n,depth,branch){
+  const o={uid:"n"+(ID++),id:n.id,term:n.term,kind:n.kind||"concept",week:n.week,graded:!!n.graded,
+    def:n.definition||"",fix:n.correction||"",summary:n.summary||"",numeral:n.numeral||"",depth,branch,
+    origin:n.origin||"",bears:n.bearsOn||"",addition:!!n.addition,
+    kids:(n.children||[]).map(k=>build(k,depth+1,branch)),open:false};
+  o.kids.forEach(k=>k.parent=o);
+  return o;
+}
+const root={uid:"root",term:A?A.name:"Atlas",kind:"root",depth:0,branch:null,open:true,
+  def:A?A.subtitle:"",kids:(A?A.branches:[]).map((b,i)=>{const t=build(b,1,HUE[i%8]);t.kind="branch";t.numeral=b.numeral;return t;})};
+root.kids.forEach(k=>k.parent=root);
+const ALL=[]; (function w(n){ALL.push(n);n.kids.forEach(w);})(root);
+const byUid=Object.fromEntries(ALL.map(n=>[n.uid,n]));
+function descendants(n){let c=0;(function w(x){x.kids.forEach(k=>{c++;w(k);})})(n);return c;}
+function conceptCount(n){let c=0;(function w(x){if(x.kind==="concept")c++;x.kids.forEach(w)})(n);return c;}
+
+const cssv=k=>getComputedStyle(document.documentElement).getPropertyValue("--"+k).trim();
+if(A){$("#counts").innerHTML=["<span>"+A.counts.concepts+" concepts</span>","<span>"+A.counts.branches+" branches</span>",
+  "<span>"+A.counts.graded+" core terms</span>","<span>"+A.counts.corrections+" corrections</span>"].join("");}
+$("#foot").innerHTML='Drawn from <b>atlas.json</b>, the same file behind the Artificial Minds Atlas outline. Colour is the branch, nothing more. A node with a <b>+n</b> badge has that many concepts folded inside it. The tree is syllabus-free: the week chips and &#9733; marks come from a separate <em>syllabusOverlay</em> block in the data, merged in for display only. This is a picture, so it is not the accessible version: the outline page carries every term and definition as text.';
+
+/* ---------- text measuring ---------- */
+const cvs=document.createElement("canvas"),ctx=cvs.getContext("2d");
+const FS={root:'600 17px Spectral,Georgia,serif',branch:'600 15px Spectral,Georgia,serif',
+  group:'600 13.5px "IBM Plex Sans",sans-serif',concept:'500 13px "IBM Plex Sans",sans-serif',
+  def:'400 12px "IBM Plex Sans",sans-serif'};
+function wrap(text,font,maxw){
+  ctx.font=font; const words=String(text).split(/\s+/); const lines=[]; let cur="";
+  for(const w of words){const t=cur?cur+" "+w:w;
+    if(ctx.measureText(t).width>maxw&&cur){lines.push(cur);cur=w;}else cur=t;}
+  if(cur)lines.push(cur);
+  return lines;
+}
+const tw=(s,f)=>{ctx.font=f;return ctx.measureText(s).width;};
+const plain=s=>String(s).replace(/<[^>]+>/g,"");
+
+/* ---------- state ---------- */
+let showDefs=false, gradedOnly=false, selected=null, matches=new Set(), query="";
+let k=1,tx=0,ty=0;
+
+function visibleKids(n){
+  let ks=n.kids;
+  if(gradedOnly)ks=ks.filter(x=>x.kind!=="concept"||x.graded||x.kids.length);
+  return ks;
+}
+
+/* ---------- layout ---------- */
+const PADX=11,PADY=7,LH=15,DEFLH=15.5,COLGAP=54,VGAP=9,GROUPGAP=16;
+function measureNode(n){
+  const kind=n.kind;
+  const font=FS[kind]||FS.concept;
+  const maxw=kind==="root"?230:kind==="branch"?210:kind==="group"?200:(showDefs?344:216);
+  const lines=wrap(plain(n.term),font,maxw);
+  let w=Math.max(...lines.map(l=>tw(l,font)));
+  let h=lines.length*LH;
+  n.lines=lines; n.defLines=null;
+  if(showDefs&&kind==="concept"&&n.def){
+    const dl=wrap(plain(n.def),FS.def,maxw);
+    n.defLines=dl; h+=6+dl.length*DEFLH;
+    w=Math.max(w,...dl.map(l=>tw(l,FS.def)));
+  }
+  if(n.graded)w+=13;
+  if(n.fix)w+=13;
+  const hidden=(!n.open&&n.kids.length)?conceptCount(n):0;
+  n.hidden=hidden;
+  if(hidden)w+=tw("+"+hidden,'500 10px "IBM Plex Mono",monospace')+14;
+  n.w=Math.ceil(w)+PADX*2; n.h=Math.ceil(h)+PADY*2;
+}
+function layout(){
+  const rows=[]; // per depth max width
+  const laid=[];
+  (function walk(n){laid.push(n);measureNode(n);rows[n.depth]=Math.max(rows[n.depth]||0,n.w);
+    if(n.open)visibleKids(n).forEach(walk);})(root);
+  const colx=[]; let acc=0;
+  for(let d=0;d<rows.length;d++){colx[d]=acc;acc+=rows[d]+COLGAP;}
+  let cursor=0;
+  (function place(n){
+    n.x=colx[n.depth];
+    const ks=n.open?visibleKids(n):[];
+    if(!ks.length){n.y=cursor+n.h/2;cursor+=n.h+VGAP;return;}
+    const before=cursor;
+    ks.forEach((c,i)=>{if(i&&(c.kind==="group"||c.kind==="branch"))cursor+=GROUPGAP;place(c);});
+    n.y=(ks[0].y+ks[ks.length-1].y)/2;
+  })(root);
+  return laid;
+}
+
+/* ---------- render ---------- */
+const NODES=$("#nodes"),EDGES=$("#edges"),SVG=$("#map"),VP=$("#viewport");
+const NS="http://www.w3.org/2000/svg";
+const el=(t,a)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;};
+let laidOut=[];
+function render(){
+  laidOut=layout();
+  EDGES.textContent="";NODES.textContent="";
+  const dim=query&&matches.size;
+  for(const n of laidOut){
+    const ks=n.open?visibleKids(n):[];
+    for(const c of ks){
+      const x1=n.x+n.w,y1=n.y,x2=c.x,y2=c.y,mx=(x1+x2)/2;
+      const p=el("path",{d:`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`,fill:"none",
+        stroke:"var(--"+(c.branch||"rule-2")+")","stroke-width":1.4,"stroke-opacity":.42});
+      if(dim&&!(matches.has(n.uid)&&matches.has(c.uid)))p.setAttribute("stroke-opacity",.12);
+      EDGES.appendChild(p);
+    }
+  }
+  for(const n of laidOut){
+    const col=n.branch?"var(--"+n.branch+")":"var(--ink)";
+    const g=el("g",{class:"node"+(dim&&!matches.has(n.uid)?" faded":""),transform:`translate(${n.x},${n.y-n.h/2})`,
+      tabindex:0,role:"button","aria-label":plain(n.term)+(n.kids.length?", "+n.kids.length+" children":"")});
+    g.dataset.uid=n.uid;
+    const sel=selected===n.uid;
+    let fill="var(--nodefill)",stroke=col,sw=1,textcol="var(--ink)";
+    if(n.kind==="root"){fill="var(--ink)";stroke="var(--ink)";textcol="var(--ground)";}
+    else if(n.kind==="branch"){fill=col;stroke=col;textcol="var(--surface)";}
+    else if(n.kind==="group"){sw=1.6;textcol=col;}
+    else {stroke="var(--rule-2)";}
+    if(n.kind==="branch"&&document.documentElement.getAttribute("data-theme")!=="dark"){textcol="#FFFFFF";}
+    g.appendChild(el("rect",{class:"box",x:0,y:0,width:n.w,height:n.h,rx:n.kind==="concept"?6:8,
+      fill:fill,stroke:sel?"var(--accent)":stroke,"stroke-width":sel?2.5:sw}));
+    const font=FS[n.kind]||FS.concept;
+    const fw=font.split(" ")[0],fsz=font.split(" ")[1],fam=font.slice(font.indexOf(fsz)+fsz.length+1);
+    let ty0=PADY+11.5, tx0=PADX;
+    if(n.graded){g.appendChild(el("circle",{cx:PADX+3.5,cy:ty0-3.5,r:3.5,fill:n.kind==="branch"?"var(--surface)":"var(--graded)"}));tx0+=13;}
+    n.lines.forEach((ln,i)=>{
+      const t=el("text",{x:tx0,y:ty0+i*LH,fill:textcol,"font-family":fam,"font-size":fsz,"font-weight":fw});
+      t.textContent=ln;g.appendChild(t);
+    });
+    if(n.fix){const fx=el("text",{x:n.w-PADX-(n.hidden?tw("+"+n.hidden,'500 10px "IBM Plex Mono",monospace')+14:0)-2,
+      y:ty0,fill:"var(--flag)","font-size":11,"text-anchor":"end"});fx.textContent="⚑";g.appendChild(fx);}
+    if(n.defLines){
+      n.defLines.forEach((ln,i)=>{
+        const t=el("text",{x:PADX,y:PADY+11.5+n.lines.length*LH+6+i*DEFLH,fill:"var(--ink-2)",
+          "font-family":'"IBM Plex Sans",sans-serif',"font-size":"12px"});
+        t.textContent=ln;g.appendChild(t);
+      });
+    }
+    if(n.hidden){
+      const lbl="+"+n.hidden, bw=tw(lbl,'500 10px "IBM Plex Mono",monospace')+10;
+      g.appendChild(el("rect",{x:n.w-bw-PADX+4,y:n.h/2-8,width:bw,height:16,rx:8,fill:col,"fill-opacity":n.kind==="branch"?.9:.14,stroke:"none"}));
+      const t=el("text",{x:n.w-bw/2-PADX+4,y:n.h/2+3.5,fill:n.kind==="branch"?"var(--surface)":col,
+        "font-family":'"IBM Plex Mono",monospace',"font-size":"10px","font-weight":500,"text-anchor":"middle"});
+      t.textContent=lbl;g.appendChild(t);
+    }
+    NODES.appendChild(g);
+  }
+  applyTransform();
+}
+function bbox(){
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  for(const n of laidOut){x0=Math.min(x0,n.x);y0=Math.min(y0,n.y-n.h/2);x1=Math.max(x1,n.x+n.w);y1=Math.max(y1,n.y+n.h/2);}
+  return {x0,y0,x1,y1,w:x1-x0,h:y1-y0};
+}
+function applyTransform(){VP.setAttribute("transform",`translate(${tx},${ty}) scale(${k})`);}
+function boxOf(nodes){
+  if(!nodes)return bbox();
+  let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+  nodes.forEach(n=>{x0=Math.min(x0,n.x);y0=Math.min(y0,n.y-n.h/2);x1=Math.max(x1,n.x+n.w);y1=Math.max(y1,n.y+n.h/2);});
+  return {x0,y0,x1,y1,w:x1-x0,h:y1-y0};
+}
+/* minK keeps type readable: below it we stop shrinking and align to the top-left instead. */
+function fit(nodes,minK){
+  const b=boxOf(nodes), r=SVG.getBoundingClientRect(), pad=26;
+  let want=Math.min((r.width-pad*2)/Math.max(b.w,1),(r.height-pad*2)/Math.max(b.h,1),1.15);
+  const floor=minK===undefined?.08:minK;
+  k=Math.max(want,floor);
+  const fitsX=b.w*k<=r.width-pad*2, fitsY=b.h*k<=r.height-pad*2;
+  tx=fitsX?pad+(r.width-pad*2-b.w*k)/2-b.x0*k:pad-b.x0*k;
+  ty=fitsY?pad+(r.height-pad*2-b.h*k)/2-b.y0*k:pad-b.y0*k;
+  applyTransform();
+}
+function subtree(n){const o=[];(function w(x){o.push(x);if(x.open)visibleKids(x).forEach(w);})(n);return o;}
+function zoomBy(f,cx,cy){
+  const r=SVG.getBoundingClientRect();
+  cx=cx===undefined?r.width/2:cx; cy=cy===undefined?r.height/2:cy;
+  const nk=Math.min(2.4,Math.max(.06,k*f));
+  tx=cx-(cx-tx)*(nk/k); ty=cy-(cy-ty)*(nk/k); k=nk; applyTransform();
+}
+
+/* ---------- panel ---------- */
+function showPanel(n){
+  if(!n){$("#panel").innerHTML='<p class="pcrumb">Nothing selected</p><p class="pempty">Click any node to read it here. The map starts at the eight branches; open one to reach the concepts inside it.</p>'+legendHTML();return;}
+  const path=[];let p=n.parent;while(p){path.unshift(plain(p.term));p=p.parent;}
+  let h='<p class="pcrumb">'+(path.length?path.join(" &rsaquo; "):"&nbsp;")+'</p>';
+  h+='<h3 class="pterm">'+n.term+'</h3><div class="pmeta">';
+  h+='<span class="tag">'+(n.kind==="concept"?"concept":n.kind)+'</span>';
+  if(n.week)h+='<span class="tag">'+n.week+'</span>';
+  if(n.graded)h+='<span class="tag g">&#9733; core term</span>';
+  if(n.addition)h+='<span class="tag n">new</span>';
+  if(n.kind!=="concept"&&n.kids.length)h+='<span class="tag">'+conceptCount(n)+' concepts</span>';
+  h+='</div>';
+  if(n.summary)h+='<p class="pdef">'+n.summary+'</p>';
+  if(n.def)h+='<p class="pdef">'+n.def+'</p>';
+  if(n.origin)h+='<p class="pmetaline"><b>Origin.</b> '+n.origin+'</p>';
+  if(n.bears)h+='<p class="pmetaline"><b>Bears on.</b> '+n.bears+'</p>';
+  if(!n.def&&!n.summary&&n.kind==="group")h+='<p class="pdef" style="color:var(--ink-3)">An organising heading, not a course term. The concepts are inside it.</p>';
+  if(n.fix)h+='<p class="pfix"><b>&#9873; Corrected.</b> '+n.fix+'</p>';
+  if(n.kids.length){h+='<div class="pkids"><h4>Inside</h4>';
+    n.kids.forEach(c=>{h+='<button type="button" data-go="'+c.uid+'">'+(c.graded?'<span style="color:var(--graded)">&#9733;</span> ':'')+plain(c.term)+'</button>';});
+    h+='</div>';}
+  $("#panel").innerHTML=h;
+  $("#panel").querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>{
+    const t=byUid[b.dataset.go];let p=t.parent;while(p){p.open=true;p=p.parent;}
+    selected=t.uid;render();showPanel(t);centerOn(t);}));
+}
+function legendHTML(){
+  if(!A)return"";
+  let h='<div class="legend">';
+  A.branches.forEach((b,i)=>{h+='<div><span class="sw" style="background:var(--'+HUE[i%8]+')"></span><span>'+b.numeral+'. '+b.term.replace(/:.*$/,"")+'</span></div>';});
+  h+='<div style="margin-top:4px"><span class="sw" style="background:var(--graded);border-radius:50%"></span><span>Core term in the current syllabus</span></div>';
+  h+='<div><span style="color:var(--flag);width:10px;text-align:center">&#9873;</span><span>Name corrected</span></div>';
+  return h+'</div>';
+}
+function centerOn(n){
+  const r=SVG.getBoundingClientRect();
+  tx=r.width/2-(n.x+n.w/2)*k; ty=r.height/2-n.y*k; applyTransform();
+}
+
+/* ---------- interaction ---------- */
+NODES.addEventListener("click",e=>{
+  const g=e.target.closest(".node"); if(!g)return;
+  const n=byUid[g.dataset.uid];
+  const opened=n.kids.length&&visibleKids(n).length&&!n.open;
+  if(n.kids.length&&visibleKids(n).length)n.open=!n.open;
+  selected=n.uid; render(); showPanel(n);
+  if(opened)fit(subtree(n),.45); else centerOn(n);
+});
+NODES.addEventListener("keydown",e=>{
+  if(e.key!=="Enter"&&e.key!==" ")return;
+  const g=e.target.closest(".node"); if(!g)return; e.preventDefault(); g.dispatchEvent(new MouseEvent("click",{bubbles:true}));
+});
+let drag=null;
+SVG.addEventListener("pointerdown",e=>{
+  if(e.target.closest(".node"))return;
+  drag={x:e.clientX,y:e.clientY,tx,ty}; SVG.classList.add("drag");
+  VP.classList.add("nt"); SVG.setPointerCapture(e.pointerId);
+});
+SVG.addEventListener("pointermove",e=>{if(!drag)return;tx=drag.tx+(e.clientX-drag.x);ty=drag.ty+(e.clientY-drag.y);applyTransform();});
+["pointerup","pointercancel"].forEach(ev=>SVG.addEventListener(ev,()=>{drag=null;SVG.classList.remove("drag");VP.classList.remove("nt");}));
+SVG.addEventListener("wheel",e=>{
+  e.preventDefault(); const r=SVG.getBoundingClientRect();
+  VP.classList.add("nt"); zoomBy(Math.pow(.999,e.deltaY),e.clientX-r.left,e.clientY-r.top);
+  clearTimeout(SVG._wt); SVG._wt=setTimeout(()=>VP.classList.remove("nt"),120);
+},{passive:false});
+
+$("#z-in").addEventListener("click",()=>zoomBy(1.25));
+$("#z-out").addEventListener("click",()=>zoomBy(.8));
+$("#z-fit").addEventListener("click",()=>fit());
+function setOpen(pred){ALL.forEach(n=>{n.open=pred(n);});selected=null;render();showPanel(null);fit(null,pred(root)&&!pred(root.kids[0])?.5:undefined);}
+/* Toggling how nodes are drawn should not throw away where the reader is looking. */
+function refocus(){
+  const n=selected&&byUid[selected];
+  if(n&&laidOut.includes(n))fit(subtree(n),.45); else fit(null,.5);
+}
+$("#b-branches").addEventListener("click",()=>setOpen(n=>n.depth<1));
+$("#b-groups").addEventListener("click",()=>setOpen(n=>n.depth<2));
+$("#b-all").addEventListener("click",()=>setOpen(()=>true));
+$("#b-defs").addEventListener("click",e=>{showDefs=!showDefs;e.currentTarget.setAttribute("aria-pressed",showDefs);render();refocus();});
+$("#b-graded").addEventListener("click",e=>{gradedOnly=!gradedOnly;e.currentTarget.setAttribute("aria-pressed",gradedOnly);render();refocus();});
+
+const q=$("#q");
+q.addEventListener("input",()=>{
+  query=q.value.trim().toLowerCase(); matches=new Set();
+  if(!query){$("#hits").textContent="";render();return;}
+  const hit=[];
+  ALL.forEach(n=>{
+    if((plain(n.term)+" "+plain(n.def)+" "+plain(n.origin)+" "+plain(n.bears)).toLowerCase().includes(query)){
+      hit.push(n); matches.add(n.uid);
+      let p=n.parent; while(p){matches.add(p.uid);p.open=true;p=p.parent;}
+    }
+  });
+  $("#hits").textContent=hit.length?hit.length+(hit.length===1?" match":" matches"):"none";
+  render();
+  if(hit.length){const vis=hit.filter(n=>laidOut.includes(n));if(vis.length)fit(vis,.5);}
+  if(hit.length===1){selected=hit[0].uid;render();showPanel(hit[0]);}
+});
+
+/* ---------- boot ---------- */
+function start(){render();fit(null,.5);showPanel(null);}
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(start).catch(start); else start();
+window.addEventListener("resize",()=>{clearTimeout(window._rt);window._rt=setTimeout(()=>fit(),200);});
+</script>
+
+</body></html>

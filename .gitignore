@@ -1,0 +1,19 @@
+# Whitelist: only the learner- and facilitator-facing course files are
+# published. Assembly instructions, changelogs, audits, dry-run logs and
+# revision history stay local.
+/*
+!.gitignore
+!index.md
+!_config.yml
+!01-syllabus.md
+!02-course-companion.md
+!03-glossary.md
+!04-facilitator-guide.md
+!05-facilitator-appendices.md
+!09-concept-atlas.md
+!atlas.json
+!forecast-yourself.html
+!atlas
+!tools
+tools/__pycache__/
+.DS_Store
